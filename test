@@ -15,7 +15,7 @@ def fetch_github_info(username):
         return None
 
 # Fonction pour générer un GIF avec démarrage lent et icônes
-def generate_terminal_gif_with_slow_boot(username, output_file="terminal.gif", width=600, height=400, font_path="SourceCodePro-Regular.ttf", font_size=16):
+def generate_terminal_gif_with_slow_boot(username, output_file="terminal.gif", width=850, height=400, font_path="SourceCodePro-Regular.ttf", font_size=16):
     # Récupérer les infos GitHub
     github_info = fetch_github_info(username)
     if not github_info:
