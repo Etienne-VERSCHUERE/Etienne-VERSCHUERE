@@ -1,6 +1,17 @@
 import requests
 from PIL import Image, ImageDraw, ImageFont
 import imageio.v3 as imageio
+import os
+from dotenv import load_dotenv
+
+# Charger le fichier .env
+load_dotenv()
+
+# Récupérer le token depuis les variables d'environnement
+IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
+
+if not IMGBB_API_KEY:
+    raise ValueError("Token API ImgBB non trouvé. Vérifie le fichier .env.")
 
 # Clé API ImgBB (remplace-la par ta propre clé API)
 IMGBB_API_KEY = "fd156800917f5e737974881bebfa0fb1"
@@ -80,7 +91,7 @@ if __name__ == "__main__":
         generate_terminal_gif(
             username=username,
             output_file="terminal.gif",
-            width=600,                # Largeur du GIF
+            width=850,                # Largeur du GIF
             height=400,               # Hauteur du GIF
             font_size=20,             # Taille de la police
             text_colors=["cyan", "yellow", "green", "magenta", "blue", "red", "white", "orange"]
