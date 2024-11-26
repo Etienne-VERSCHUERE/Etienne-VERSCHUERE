@@ -20,7 +20,7 @@ def fetch_github_info(username):
 def generate_terminal_gif(username, output_file="terminal.gif"):
     console = Console()
     frames = []
-    width, height = 320, 240
+    width, height = 600, 240
 
     # Récupérer les infos GitHub publiques
     github_info = fetch_github_info(username)
@@ -52,11 +52,11 @@ def generate_terminal_gif(username, output_file="terminal.gif"):
         frames.append(img.copy())  # Ajouter chaque étape à l'animation
 
     # Sauvegarder en GIF
-    imageio.imwrite(output_file, frames, duration=0.5)
+    imageio.imwrite(output_file, frames, duration=1)
     console.print(Panel(f"[green]GIF créé avec succès : {output_file}"))
 
 # Demander le nom d'utilisateur GitHub
-username = input("Entrez le nom d'utilisateur GitHub : ")
+username = "Etienne-VERSCHUERE"
 
 # Générer le GIF
 generate_terminal_gif(username, "terminal.gif")

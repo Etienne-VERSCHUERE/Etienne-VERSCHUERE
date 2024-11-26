@@ -15,7 +15,7 @@ IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
 def generate_terminal_gif(output_file="terminal.gif"):
     console = Console()
     frames = []
-    width, height = 320, 240
+    width, height = 600, 240
 
     # Informations à afficher
     terminal_lines = [
