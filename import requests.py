@@ -1,8 +1,9 @@
 import requests
 from PIL import Image, ImageDraw, ImageFont
 import imageio.v3 as imageio
-from rich.console import Console
-from rich.panel import Panel
+
+# Clé API ImgBB (remplace-la par ta propre clé API)
+IMGBB_API_KEY = "fd156800917f5e737974881bebfa0fb1"
 
 # Fonction pour récupérer les infos publiques de GitHub
 def fetch_github_info(username):
@@ -14,23 +15,17 @@ def fetch_github_info(username):
         print(f"Erreur HTTP {response.status_code}: {response.text}")
         return None
 
-# Fonction pour générer un GIF avec des options personnalisables
+# Fonction pour générer un GIF
 def generate_terminal_gif(username, output_file="terminal.gif", width=400, height=300, font_size=16, text_colors=None):
-    console = Console()
-    frames = []
-
-    # Récupérer les infos GitHub publiques
     github_info = fetch_github_info(username)
     if not github_info:
-        console.print("[red]Erreur lors de la récupération des infos GitHub.")
-        return
+        raise ValueError("Erreur lors de la récupération des infos GitHub.")
 
-    # Informations à afficher
     terminal_lines = [
         f"💻 Welcome to {github_info['name']} 's Terminal",
         "-----------------------------------",
         f"👤 Name: {github_info['name']}",
-        f"📖 Bio: {github_info['bio']}",
+        f"📖 Bio: {github_info.get('bio', 'N/A')}",
         f"📚 Public Repos: {github_info['public_repos']}",
         f"👥 Followers: {github_info['followers']}",
         f"➡️ Following: {github_info['following']}",
@@ -47,33 +42,57 @@ def generate_terminal_gif(username, output_file="terminal.gif", width=400, heigh
     except:
         font = ImageFont.load_default()
 
-    # Créer chaque cadre (image) pour l'animation
-    img = Image.new("RGB", (width, height), color=(0, 0, 0))  # Image de fond noire
+    frames = []
+    img = Image.new("RGB", (width, height), color=(0, 0, 0))  # Fond noir
     draw = ImageDraw.Draw(img)
 
     y_offset = 10
     for i, line in enumerate(terminal_lines):
-        # Dessiner le texte ligne par ligne avec des couleurs personnalisées
-        color = text_colors[i] if i < len(text_colors) else "white"  # Utiliser la couleur correspondante ou blanc
+        color = text_colors[i] if i < len(text_colors) else "white"
         draw.text((10, y_offset), line, font=font, fill=color)
-        y_offset += font_size + 7  # Ajuster l'espacement vertical
+        y_offset += font_size + 7  # Espacement entre les lignes
+        frames.append(img.copy())  # Ajout du cadre à l'animation
 
-        # Ajouter une copie de l'image dans les frames
-        frames.append(img.copy())
+    imageio.imwrite(output_file, frames, duration=0.5)  # Sauvegarder en GIF
 
-    # Sauvegarder en GIF
-    imageio.imwrite(output_file, frames, duration=0.5)
-    console.print(Panel(f"[green]GIF créé avec succès : {output_file}"))
+# Fonction pour envoyer le GIF à ImgBB
+def upload_to_imgbb(file_path):
+    with open(file_path, "rb") as file:
+        response = requests.post(
+            "https://api.imgbb.com/1/upload",
+            data={"key": IMGBB_API_KEY},
+            files={"image": file},
+        )
+    if response.status_code == 200:
+        return response.json()["data"]["url"]
+    else:
+        print(f"Erreur ImgBB {response.status_code}: {response.text}")
+        return None
 
-# Demander le nom d'utilisateur GitHub
-username = "Etienne-VERSCHUERE"
-# Personnalisation de la taille, des couleurs et du fichier de sortie
-generate_terminal_gif(
-    username=username,
-    output_file="terminal.gif",
-    width=600,                # Largeur de l'image
-    height=400,               # Hauteur de l'image
-    font_size=20,             # Taille de la police
-    text_colors=["cyan", "yellow", "green", "magenta", "blue", "red", "white", "orange"]  # Couleurs personnalisées
-)
+# Programme principal
+if __name__ == "__main__":
+    # Nom d'utilisateur GitHub à récupérer
+    username = "octocat"  # Remplace par un autre nom si nécessaire
 
+    try:
+        # Générer le GIF
+        print("Génération du GIF...")
+        generate_terminal_gif(
+            username=username,
+            output_file="terminal.gif",
+            width=600,                # Largeur du GIF
+            height=400,               # Hauteur du GIF
+            font_size=20,             # Taille de la police
+            text_colors=["cyan", "yellow", "green", "magenta", "blue", "red", "white", "orange"]
+        )
+        print("GIF généré avec succès : terminal.gif")
+
+        # Envoyer le GIF sur ImgBB
+        print("Envoi sur ImgBB...")
+        gif_url = upload_to_imgbb("terminal.gif")
+        if gif_url:
+            print(f"GIF hébergé sur ImgBB : {gif_url}")
+        else:
+            print("Erreur lors de l'envoi du GIF sur ImgBB.")
+    except ValueError as e:
+        print(f"Erreur : {e}")
