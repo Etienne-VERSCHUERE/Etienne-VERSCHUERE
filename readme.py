@@ -6,6 +6,7 @@ import imageio.v3 as imageio
 import os
 from dotenv import load_dotenv
 
+
 # Charger la clé IMGBB depuis le fichier .env
 load_dotenv()
 IMGBB_API_KEY = os.getenv("IMGBB_API_KEY")
