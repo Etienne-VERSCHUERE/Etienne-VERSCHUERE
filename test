@@ -1,0 +1,124 @@
+import requests
+from PIL import Image, ImageDraw, ImageFont
+import imageio.v3 as imageio
+from time import sleep
+from datetime import datetime
+
+# Fonction pour récupérer les informations publiques de GitHub
+def fetch_github_info(username):
+    url = f"https://api.github.com/users/{username}"
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        print(f"Erreur HTTP {response.status_code}: {response.text}")
+        return None
+
+# Fonction pour générer un GIF avec démarrage lent et icônes
+def generate_terminal_gif_with_slow_boot(username, output_file="terminal.gif", width=600, height=400, font_path="SourceCodePro-Regular.ttf", font_size=16):
+    # Récupérer les infos GitHub
+    github_info = fetch_github_info(username)
+    if not github_info:
+        print("[Erreur] Impossible de récupérer les informations GitHub.")
+        return
+
+    # Messages de démarrage Unix/Linux fictifs
+    boot_messages = [
+        "[OK] Initializing system services...",
+        "[OK] Starting network configuration...",
+        "[OK] Mounting filesystems...",
+        "[OK] Loading kernel modules...",
+        "[OK] Starting SSH daemon...",
+        "[OK] Syncing system clock...",
+        "[OK] Checking disk space...",
+        "[OK] System ready.",
+    ]
+
+    # Données GitHub avec chemins d'icônes et couleurs
+    github_lines = [
+        {"icon": "icons/terminal.png", "text": f"Welcome to {github_info['name']}'s Terminal", "color": "cyan"},
+        {"icon": None, "text": "-----------------------------------", "color": "white"},
+        {"icon": "icons/user.png", "text": f"Name: {github_info['name']}", "color": "green"},
+        {"icon": "icons/bio.png", "text": f"Bio: {github_info['bio'] or 'No bio available.'}", "color": "yellow"},
+        {"icon": "icons/repos.png", "text": f"Public Repos: {github_info['public_repos']}", "color": "blue"},
+        {"icon": "icons/followers.png", "text": f"Followers: {github_info['followers']}", "color": "magenta"},
+        {"icon": "icons/following.png", "text": f"Following: {github_info['following']}", "color": "red"},
+        {"icon": "icons/link.png", "text": f"Profile: {github_info['html_url']}", "color": "orange"},
+        {"icon": "icons/clock.png", "text": f"Last Updated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}", "color": "white"},
+    ]
+
+    # Charger la police
+    try:
+        font = ImageFont.truetype(font_path, font_size)
+    except:
+        print("[Erreur] Police introuvable, utilisation de la police par défaut.")
+        font = ImageFont.load_default()
+
+    # Préparer les cadres pour l'animation
+    frames = []
+    img = Image.new("RGB", (width, height), color=(0, 0, 0))  # Fond noir
+    draw = ImageDraw.Draw(img)
+
+    # Étape 1 : Afficher un compteur de progression (0 à 100%)
+    y_offset = 10
+    for i in range(101):
+        draw.rectangle([0, 0, width, height], fill=(0, 0, 0))  # Effacer l'écran
+        progress_text = f"Booting... {i}%"
+        draw.text((width // 2 - 50, height // 2), progress_text, font=font, fill="green")
+        frames.append(img.copy())
+        sleep(0.07)  # Délai légèrement plus long
+
+    # Étape 2 : Simuler le démarrage Unix avec défilement lent
+    for message in boot_messages:
+        draw.rectangle([0, 0, width, height], fill=(0, 0, 0))  # Effacer l'écran
+        draw.text((10, y_offset), message, font=font, fill="green")
+        y_offset += font_size + 7
+        frames.append(img.copy())
+        sleep(0.7)  # Rendre chaque message plus lent
+
+    # Ajouter une pause après le démarrage
+    for _ in range(15):
+        frames.append(img.copy())
+
+    # Étape 3 : Effacer l'écran et afficher les informations GitHub avec icônes
+    img = Image.new("RGB", (width, height), color=(0, 0, 0))  # Réinitialiser le fond noir
+    draw = ImageDraw.Draw(img)
+    y_offset = 10
+
+    for line in github_lines:
+        # Dessiner l'icône si disponible
+        if line["icon"]:
+            try:
+                icon = Image.open(line["icon"]).resize((font_size, font_size))  # Ajuster la taille de l'icône
+                img.paste(icon, (10, y_offset))  # Positionner l'icône
+                text_offset = 10 + font_size + 5  # Décaler le texte après l'icône
+            except FileNotFoundError:
+                print(f"[Erreur] Icône non trouvée : {line['icon']}")
+                text_offset = 10  # Pas de décalage si icône absente
+        else:
+            text_offset = 10
+
+        # Dessiner le texte
+        draw.text((text_offset, y_offset), line["text"], font=font, fill=line["color"])
+        y_offset += font_size + 10  # Espacement entre les lignes
+
+        # Ajouter une image pour ce cadre
+        frames.append(img.copy())
+
+    # Sauvegarder en GIF
+    imageio.imwrite(output_file, frames, duration=0.5)
+    print(f"[INFO] GIF créé avec succès : {output_file}")
+
+# Fonction pour actualiser automatiquement le GIF toutes les 15 secondes
+def auto_refresh_gif_with_slow_boot(username, output_file="terminal.gif"):
+    while True:
+        print("[INFO] Génération du GIF avec démarrage...")
+        generate_terminal_gif_with_slow_boot(username, output_file=output_file)
+        print("[INFO] Attente de 15 secondes avant la prochaine mise à jour.")
+        sleep(15)
+
+# Nom d'utilisateur GitHub à utiliser
+USERNAME = "Etienne-VERSCHUERE"  # Remplacez par votre nom d'utilisateur GitHub
+
+# Exécuter l'auto-refresh avec démarrage lent
+#auto_refresh_gif_with_slow_boot(USERNAME, "github_terminal_slow_boot.gif")

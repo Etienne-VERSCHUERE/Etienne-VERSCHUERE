@@ -32,6 +32,15 @@ def generate_terminal_gif(username, output_file="terminal.gif", width=400, heigh
     if not github_info:
         raise ValueError("Erreur lors de la récupération des infos GitHub.")
 
+    boot_messages = [
+        "[OK] Initializing system services...",
+        "[OK] Starting network configuration...",
+        "[OK] Mounting filesystems...",
+        "[OK] Loading kernel modules...",
+        "[OK] Starting SSH daemon...",
+        "[OK] Syncing system clock...",
+        "[OK] Checking disk space...",
+        "[OK] System ready."]
     terminal_lines = [
         f"💻 Welcome to {github_info['name']} 's Terminal",
         "-----------------------------------",
@@ -65,6 +74,17 @@ def generate_terminal_gif(username, output_file="terminal.gif", width=400, heigh
         frames.append(img.copy())  # Ajout du cadre à l'animation
 
     imageio.imwrite(output_file, frames, duration=0.5)  # Sauvegarder en GIF
+# Simuler le démarrage Unix
+    y_offset = 10
+    for i, message in enumerate(boot_messages):
+        draw.text((10, y_offset), message, font=font, fill="green")
+        y_offset += font_size + 5
+        frames.append(img.copy())
+          # Simuler un délai pour chaque message
+
+    # Ajouter une pause après le démarrage
+    for _ in range(5):
+        frames.append(img.copy())
 
 # Fonction pour envoyer le GIF à ImgBB
 def upload_to_imgbb(file_path):
@@ -80,12 +100,7 @@ def upload_to_imgbb(file_path):
         print(f"Erreur ImgBB {response.status_code}: {response.text}")
         return None
 
-def main(username, refresh_interval=15):
-    """
-    Boucle infinie qui régénère le GIF à intervalle régulier.
-    :param username: Nom d'utilisateur GitHub.
-    :param refresh_interval: Intervalle en secondes entre chaque régénération.
-    """
+
 # Programme principal
 if __name__ == "__main__":
     # Nom d'utilisateur GitHub à récupérer
