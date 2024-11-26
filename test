@@ -66,7 +66,7 @@ def generate_terminal_gif_with_slow_boot(username, output_file="terminal.gif", w
         progress_text = f"Booting... {i}%"
         draw.text((width // 2 - 50, height // 2), progress_text, font=font, fill="green")
         frames.append(img.copy())
-        sleep(0.07)  # Délai légèrement plus long
+        sleep(0.01)  # Délai légèrement plus long
 
     # Étape 2 : Simuler le démarrage Unix avec défilement lent
     for message in boot_messages:
@@ -74,7 +74,7 @@ def generate_terminal_gif_with_slow_boot(username, output_file="terminal.gif", w
         draw.text((10, y_offset), message, font=font, fill="green")
         y_offset += font_size + 7
         frames.append(img.copy())
-        sleep(0.7)  # Rendre chaque message plus lent
+        sleep(1.5)  # Rendre chaque message plus lent
 
     # Ajouter une pause après le démarrage
     for _ in range(15):
@@ -121,4 +121,4 @@ def auto_refresh_gif_with_slow_boot(username, output_file="terminal.gif"):
 USERNAME = "Etienne-VERSCHUERE"  # Remplacez par votre nom d'utilisateur GitHub
 
 # Exécuter l'auto-refresh avec démarrage lent
-#auto_refresh_gif_with_slow_boot(USERNAME, "github_terminal_slow_boot.gif")
+auto_refresh_gif_with_slow_boot(USERNAME, "github_terminal_slow_boot.gif")
