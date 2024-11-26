@@ -72,7 +72,7 @@ def upload_to_imgbb(file_path):
 # Programme principal
 if __name__ == "__main__":
     # Nom d'utilisateur GitHub à récupérer
-    username = "octocat"  # Remplace par un autre nom si nécessaire
+    username = "Etienne-VERSCHUERE"  # Remplace par un autre nom si nécessaire
 
     try:
         # Générer le GIF
