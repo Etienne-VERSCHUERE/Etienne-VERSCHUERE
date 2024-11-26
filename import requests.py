@@ -80,6 +80,12 @@ def upload_to_imgbb(file_path):
         print(f"Erreur ImgBB {response.status_code}: {response.text}")
         return None
 
+def main(username, refresh_interval=15):
+    """
+    Boucle infinie qui régénère le GIF à intervalle régulier.
+    :param username: Nom d'utilisateur GitHub.
+    :param refresh_interval: Intervalle en secondes entre chaque régénération.
+    """
 # Programme principal
 if __name__ == "__main__":
     # Nom d'utilisateur GitHub à récupérer
